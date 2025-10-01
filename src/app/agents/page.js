@@ -79,8 +79,11 @@ export default function MultiAgentChatPage() {
       if (!interpRes.ok) throw new Error("Interpreter request failed");
 
       const interpJson = await interpRes.json();
-      console.log("Interpreter response:", interpJson);
-      const aiMessage = { role: "assistant", content: interpJson.response };
+      const aiMessage = {
+        role: "assistant",
+        content: interpJson.response,
+        structuredData: agent === "email" ? data.result.emails || [] : null,
+      };
 
       updateChatMessages([...updatedMessages, aiMessage]);
     } catch (err) {
@@ -219,7 +222,10 @@ export default function MultiAgentChatPage() {
                 }`}
               >
                 {msg.role === "assistant" ? (
-                  <ResponseRenderer agent={agent} text={msg.content} />
+                  <ResponseRenderer
+                    text={msg.content}
+                    structuredData={msg.structuredData}
+                  />
                 ) : (
                   msg.content
                 )}
